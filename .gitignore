@@ -1,6 +1,5 @@
 .vscode
 *.rdb
-kuka_workspace/src/CMakeLists.txt
 
 # generated from hydra
 outputs
