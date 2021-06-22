@@ -82,6 +82,7 @@ RotationObj(quaternion=tensor([0., 0., 0., 1.]))
 
 Operations:
 ```py
+import numpy as np
 from torchcontrol.transform import Rotation as R
 
 r1 = R.from_rotvec(torch.Tensor([0., 0., np.pi/2]))
@@ -90,13 +91,13 @@ r2 = R.from_rotvec(torch.Tensor([0., 0., -np.pi/2]))
 # Inverse
 r1.inv()
 '''
-RotationObj(quaternion=tensor([0., 0., 0., 1.]))
+RotationObj(quaternion=tensor([0., 0., -0.707, 0.707]))
 '''
 
 # Multiplication
 r1 * r2
 '''
-RotationObj(quaternion=tensor([0., 0., -0.707, 0.707]))
+RotationObj(quaternion=tensor([0., 0., 0., 1.]))
 '''
 
 # Applying rotation to a vector
@@ -115,13 +116,13 @@ r = R.from_rotvec(torch.Tensor([1., 1., 0.]))
 # Axis of rotation
 r.axis()
 '''
-torch.Tensor([0.707, 0.707, 0.])
+tensor([0.707, 0.707, 0.])
 '''
 
 # Magnitude of rotation (radians)
 r.magnitude()
 '''
-torch.Tensor([1.4142])
+tensor([1.4142])
 '''
 ```
 
@@ -168,7 +169,7 @@ T.from_rot_xyz(
 )
 '''
 TransformationObj(
-    rotation=RotationObj(quaternion=[0., 0., 0., 1.]),
+    rotation=RotationObj(quaternion=tensor([0., 0., 0., 1.])),
     translation=tensor([0., 0., 0.])
 )
 '''
@@ -177,7 +178,7 @@ TransformationObj(
 T.from_matrix(torch.eye(4))
 '''
 TransformationObj(
-    rotation=RotationObj(quaternion=[0., 0., 0., 1.]),
+    rotation=RotationObj(quaternion=tensor([0., 0., 0., 1.])),
     translation=tensor([0., 0., 0.])
 )
 '''
@@ -186,7 +187,7 @@ TransformationObj(
 T.identity()
 '''
 TransformationObj(
-    rotation=RotationObj(quaternion=[0., 0., 0., 1.]),
+    rotation=RotationObj(quaternion=tensor([0., 0., 0., 1.])),
     translation=tensor([0., 0., 0.])
 )
 '''
@@ -209,7 +210,7 @@ t2 = T.from_rot_xyz(
 t1.inv()
 '''
 TransformationObj(
-    rotation=RotationObj(quaternion=[0., 0., 0., 1.]),
+    rotation=RotationObj(quaternion=tensor([0., 0., 0., 1.])),
     translation=tensor([-1., 0., 0.])
 )
 '''
@@ -218,7 +219,7 @@ TransformationObj(
 t1 * t2
 '''
 TransformationObj(
-    rotation=RotationObj(quaternion=[0., 0., 0., 1.]),
+    rotation=RotationObj(quaternion=tensor([0., 0., 0., 1.])),
     translation=tensor([1., 1., 0.])
 )
 '''
@@ -248,7 +249,7 @@ tensor([1., 1., 1.])
 # Rotation
 t.rotation()
 '''
-RotationObj(quaternion=[0., 0., 1., 0.]),
+RotationObj(quaternion=tensor([0., 0., 1., 0.])),
 '''
 ```
 
