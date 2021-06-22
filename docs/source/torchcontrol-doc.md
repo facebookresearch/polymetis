@@ -55,7 +55,7 @@ Example code is provided below to demonstrate API usage.
 ### Rotations
 
 Rotations are stored as quaternions due to computational and memory efficiency.
-(Note that quaternions are expressed in the XYZW format, as with the other libraries used in Polymetis, including Pinocchio, Pybullet, and Eigen.)
+(Note that quaternions are expressed in the XYZW format, as with the other third-party libraries used in Polymetis, including Pinocchio, Pybullet, and Eigen.)
 
 Creating rotation objects:
 ```py
