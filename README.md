@@ -27,7 +27,7 @@ You can immediately start running the [example scripts](https://github.com/faceb
 
 ## Documentation
 
-All documentation at the [website](https://polymetis-docs.github.io/). Includes:
+All documentation on the [website](https://polymetis-docs.github.io/). Includes:
 
 - Guides on setting up your [Franka Panda](https://frankaemika.github.io/docs/libfranka.html) hardware for real-time control
 - How to quickly get started in [PyBullet](https://github.com/bulletphysics/bullet30) simulation
