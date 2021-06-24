@@ -208,6 +208,7 @@ class BaseRobotInterface:
             update_interval = self.grpc_connection.UpdateController(msg_generator())
         except grpc.RpcError as e:
             print(e)
+            return
 
         episode_interval = self.grpc_connection.GetEpisodeInterval(EMPTY)
 
