@@ -1,11 +1,11 @@
-# Polymetis: a real-time PyTorch controller manager
+# [Polymetis](https://polymetis-docs.github.io/): a real-time PyTorch controller manager
 
 [![CircleCI](https://circleci.com/gh/facebookresearch/polymetis/tree/main.svg?style=svg&circle-token=862dc8467344f7ac54f9a706e99c6e2ab57f067f)](https://circleci.com/gh/facebookresearch/polymetis/tree/main)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 > **Polymetis**: adj., Ancient Greek. _Clever in many ways._ Applied to Odysseus by Homer in the _Odyssey_.
 
-**Write [PyTorch controllers](http://pytorch.org/) for robots, test them in simulation, and seamlessly transfer to real-time hardware.**
+**Write [PyTorch](http://pytorch.org/) controllers for robots, test them in simulation, and seamlessly transfer to real-time hardware.**
 
 **Polymetis** powers robotics research at [Facebook AI Research](https://ai.facebook.com/). If you want to write your robot policies in PyTorch for simulation and immediately transfer them to high-frequency (1kHz) policies on real-time hardware (e.g. Franka Panda), read on!
 
