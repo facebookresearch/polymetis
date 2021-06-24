@@ -209,7 +209,10 @@ class BulletManipulatorEnv(AbstractControlledEnv):
         return ee_position, ee_orient_quaternion
 
     def compute_inverse_kinematics(
-        self, target_position: List[float], target_orientation: List[float] = None
+        self,
+        target_position: List[float],
+        target_orientation: List[float] = None,
+        rest_poses: List[float] = None,
     ):
         """Computes inverse kinematics.
 
@@ -234,6 +237,8 @@ class BulletManipulatorEnv(AbstractControlledEnv):
             targetOrientation=target_orientation,
             upperLimits=self.joint_limits_high.tolist(),
             lowerLimits=self.joint_limits_low.tolist(),
+            jointRanges=(self.joint_limits_high - self.joint_limits_low).tolist(),
+            restPoses=rest_poses,
             jointDamping=self.joint_damping.tolist(),
         )
         return np.array(joint_des_pos)
