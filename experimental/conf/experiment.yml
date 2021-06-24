@@ -1,0 +1,6 @@
+model:
+  lr: 1e-5
+  layers: [100, 50]
+
+task:
+  desired_pos: []
