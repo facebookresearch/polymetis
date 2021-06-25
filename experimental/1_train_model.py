@@ -1,15 +1,26 @@
+import os
+
 import torch
 import hydra
 
-@hydra.main(config="conf/experiment.yml")
+from models.mlp import MlpTrainer
+
+@hydra.main(config_path="conf/experiment.yml")
 def main(cfg):
     # Load data
+    assert data_dir
+    data_path = os.path.join(hydra.utils.get_original_cwd(), data_dir, cfg.data.filename)
+    data = torch.load(cfg.data_dir)
+    print(f"Data loaded from {data_path}")
 
-    # Create model
-
-    # Train model
+    # Create & train model
+    print("Training model...")
+    mlp = MlpTrainer(cfg.model)
+    mlp.train(data)
 
     # Save model
+    mlp.save(cfg.model.filename)
+    print(f"Model saved to: {os.path.join(os.getcwd(), cfg.model.filename)}")
 
 if __name__ == '__main__':
     main()

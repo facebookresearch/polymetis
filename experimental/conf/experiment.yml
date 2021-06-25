@@ -1,6 +1,18 @@
+task:
+  n_dofs: 7
+  desired_pos: [0.5238, -0.0939,  0.4285]
+
+data:
+  filename: "data.pt"
+
 model:
   lr: 1e-5
-  layers: [100, 50]
+  epochs: 100
+  batchsize: 100
+  n_in: 14
+  n_hiddens: [100, 50]
+  n_out: 7
+  filename: "model.pt"
 
-task:
-  desired_pos: []
+data_dir: ""
+model_dir: ""
