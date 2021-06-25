@@ -27,15 +27,6 @@ class NNController(toco.PolicyModule):
 
 @hydra.main(config_path="conf/experiment.yml")
 def main(cfg):
-    # Initialize robot
-    robot = RobotInterface(ip_address="localhost")
-
-    # Move robot to desired pos
-    print("Moving robot to desired position...")
-    robot.set_ee_pose(
-        position=torch.Tensor(cfg.task.desired_pos), orientation=None, time_to_go=3.0
-    )
-
     # Load model & create controller
     print("Loading model...")
     assert (
@@ -50,6 +41,15 @@ def main(cfg):
 
     net = mlp.get_model()
     nn_policy = NNController(net)
+
+    # Initialize robot
+    robot = RobotInterface(ip_address="localhost")
+
+    # Move robot to desired pos
+    print("Moving robot to desired position...")
+    robot.set_ee_pose(
+        position=torch.Tensor(cfg.task.desired_pos), orientation=None, time_to_go=3.0
+    )
 
     # Execute model
     print("Executing NN policy...")
