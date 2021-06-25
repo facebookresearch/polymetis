@@ -7,6 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 
+
 class MlpDataset(Dataset):
     def __init__(self, data):
         self.data_ls = [(x, y) for x, y in zip(data["inputs"], data["outputs"])]
@@ -18,8 +19,8 @@ class MlpDataset(Dataset):
         data_entry = self.data_ls[idx]
         return {"x": data_entry[0], "y": data_entry[1]}
 
-class Mlp(torch.nn.Module):
 
+class Mlp(torch.nn.Module):
     def __init__(self, n_in, n_out, n_hiddens):
         super().__init__()
 
@@ -27,9 +28,9 @@ class Mlp(torch.nn.Module):
 
         widths = [n_in] + list(n_hiddens)
         for i in range(len(widths) - 1):
-            fc = nn.Linear(widths[i], widths[i+1])
+            fc = nn.Linear(widths[i], widths[i + 1])
             self.fc_ls.append(fc)
-        
+
         self.out = nn.Linear(widths[-1], n_out)
 
     def forward(self, x):
@@ -55,7 +56,6 @@ class MlpTrainer:
         dataset = MlpDataset(data)
         dataloader = DataLoader(dataset, batch_size=self.cfg.batchsize, shuffle=True)
 
-
         for epoch in tqdm(range(self.cfg.epochs)):
             for batch in dataloader:
                 self.optimizer.zero_grad()
@@ -66,7 +66,6 @@ class MlpTrainer:
                 loss = self.criterion(y, y_hat)
                 loss.backward()
                 self.optimizer.step()
-
 
     def save(self, filename):
         torch.save(self.net.state_dict(), filename)

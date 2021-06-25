@@ -8,6 +8,7 @@ import hydra
 from polymetis import RobotInterface
 import torchcontrol as toco
 
+
 @hydra.main(config_path="conf/experiment.yml")
 def main(cfg):
     # Initialize robot
@@ -26,7 +27,7 @@ def main(cfg):
         joint_pos_current=joint_pos_current,
         Kp=robot.metadata.default_Kq,
         Kd=robot.metadata.default_Kqd,
-        robot_model=robot.robot_model
+        robot_model=robot.robot_model,
     )
 
     robot.send_torch_policy(pd_policy, blocking=False)
@@ -43,7 +44,10 @@ def main(cfg):
     joint_vel_ls = [e.joint_velocities for e in log]
     torque_ls = [e.joint_torques_computed for e in log]
 
-    states = [torch.cat([torch.Tensor(joint_pos), torch.Tensor(joint_vel)]) for joint_pos, joint_vel in zip(joint_pos_ls, joint_vel_ls)]
+    states = [
+        torch.cat([torch.Tensor(joint_pos), torch.Tensor(joint_vel)])
+        for joint_pos, joint_vel in zip(joint_pos_ls, joint_vel_ls)
+    ]
     actions = [torch.Tensor(torque) for torque in torque_ls]
 
     data = {
@@ -53,5 +57,6 @@ def main(cfg):
     torch.save(data, cfg.data.filename)
     print(f"Data saved to: {os.path.join(os.getcwd(), cfg.data.filename)}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
