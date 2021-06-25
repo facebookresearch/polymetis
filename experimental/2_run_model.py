@@ -43,7 +43,7 @@ def main(cfg):
         hydra.utils.get_original_cwd(), cfg.model_dir, cfg.model.filename
     )
     mlp = MlpTrainer(cfg.model)
-    # mlp.load(model_path)
+    mlp.load(model_path)
     print(f"Model loaded from {model_path}")
 
     net = mlp.get_model()
