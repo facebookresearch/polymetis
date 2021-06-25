@@ -38,7 +38,9 @@ def main(cfg):
 
     # Load model & create controller
     print("Loading model...")
-    assert cfg.model_dir
+    assert (
+        cfg.model_dir
+    ), "Missing model dir. Add hydra override 'model_dir=<hydra output dir for previous run of 1_model_training.py>'"
     model_path = os.path.join(
         hydra.utils.get_original_cwd(), cfg.model_dir, cfg.model.filename
     )

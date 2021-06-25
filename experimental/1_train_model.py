@@ -9,7 +9,9 @@ from models.mlp import MlpTrainer
 @hydra.main(config_path="conf/experiment.yml")
 def main(cfg):
     # Load data
-    assert cfg.data_dir
+    assert (
+        cfg.data_dir
+    ), "Missing data dir. Add hydra override 'data_dir=<hydra output dir for previous run of 0_collect_data.py>'"
     data_path = os.path.join(
         hydra.utils.get_original_cwd(), cfg.data_dir, cfg.data.filename
     )
