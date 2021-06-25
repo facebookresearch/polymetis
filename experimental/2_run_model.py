@@ -1,4 +1,5 @@
 import os
+from typing import Dict
 
 import torch
 
@@ -10,9 +11,10 @@ from models.mlp import MlpTrainer
 
 class NNController(toco.PolicyModule):
     def __init__(self, net):
+        super().__init__()
         self.net = net
 
-    def forward(state_dict):
+    def forward(state_dict: Dict[str, torch.Tensor]):
         joint_pos = state_dict["joint_pos"]
         joint_vel = state_dict["joint_vel"]
 
@@ -33,18 +35,24 @@ def main(cfg):
 
     # Load model & create controller
     print("Loading model...")
-    assert model_dir
-    model_path = os.path.join(hydra.utils.get_original_cwd(), model_dir, cfg.model.filename)
+    assert cfg.model_dir
+    model_path = os.path.join(hydra.utils.get_original_cwd(), cfg.model_dir, cfg.model.filename)
     mlp = MlpTrainer(cfg.model)
     mlp.load(model_path)
     print(f"Model loaded from {model_path}")
 
     net = mlp.get_model()
-    policy = NNController(net)
+    nn_policy = NNController(net)
 
     # Execute model
     print("Executing NN policy...")
-    robot.send_torch_policy(policy)
+    robot.send_torch_policy(nn_policy, blocking=False)
+    try:
+        time.sleep(20)
+    except KeyboardInterrupt:
+        print("Interrupted by user.")
+    log = robot.terminate_current_policy()
+
 
 
 if __name__ == '__main__':

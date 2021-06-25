@@ -22,14 +22,14 @@ def main(cfg):
     # Execute Cartesian PD
     print("Executing demonstration policy...")
     joint_pos_current = robot.get_joint_angles()
-    ee_pd_policy = toco.policies.CartesianImpedanceControl(
+    pd_policy = toco.policies.JointImpedanceControl(
         joint_pos_current=joint_pos_current,
         Kp=robot.metadata.default_Kq,
         Kd=robot.metadata.default_Kqd,
         robot_model=robot.robot_model
     )
 
-    robot.send_torch_policy(ee_pd_policy, blocking=False)
+    robot.send_torch_policy(pd_policy, blocking=False)
     try:
         time.sleep(60)
     except KeyboardInterrupt:
