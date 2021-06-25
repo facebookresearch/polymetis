@@ -32,7 +32,7 @@ def main(cfg):
 
     robot.send_torch_policy(pd_policy, blocking=False)
     try:
-        time.sleep(60)
+        time.sleep(cfg.data.collection_time)
     except KeyboardInterrupt:
         print("Interrupted by user.")
     log = robot.terminate_current_policy()

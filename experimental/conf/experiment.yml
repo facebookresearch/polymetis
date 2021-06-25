@@ -3,6 +3,7 @@ task:
   desired_pos: [0.5238, -0.0939,  0.4285]
 
 data:
+  collection_time: 60
   filename: "data.pt"
 
 model:
