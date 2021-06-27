@@ -4,14 +4,5 @@ data:
   collection_time: 5
   filename: "data.pt"
 
-model:
-  lr: 1e-5
-  epochs: 100
-  batchsize: 100
-  n_in: 14
-  n_hiddens: [100, 50]
-  n_out: 7
-  filename: "model.pt"
-
 data_dir: ""
 model_dir: ""
