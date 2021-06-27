@@ -10,8 +10,10 @@ RADIUS = 0.15
 PERIOD = 4
 
 
-def timestamp2float(timestamp: google.protobuf.timestamp_pb2.Timestamp):
-    return timestamp.seconds + 1e-9 * timestamp.nanos
+def timestamp_diff(ts1, ts2):
+    return (ts1[0] - ts2[0]).to(torch.float32) + 1e-9 * (ts1[1] - ts2[1]).to(
+        torch.float32
+    )
 
 
 class CircleDemoController(toco.PolicyModule):
@@ -22,22 +24,23 @@ class CircleDemoController(toco.PolicyModule):
     def __init__(self, joint_positions, Kp, Kd, robot_model, period):
         super().__init__()
         self.robot_model = robot_model
-        self.period = period
 
-        self.omega = 2 * PI / self.period
+        self.omega = 2 * PI / PERIOD
         self.radius = RADIUS
         self.feedback = toco.modules.JointSpacePD(Kp, Kd)
 
         # Initialize
         self.x0, _ = self.robot_model.forward_kinematics(joint_positions)
-        self.t0 = torch.tensor(-1.0)
+        self.ts0 = -torch.ones(2, dtype=torch.int32)
 
     def forward(self, state_dict: Dict[str, torch.Tensor]):
         # Acquire timestamp
-        t = state_dict["timestamp"]
-        if self.t0 < 0:
-            self.t0 = t
-        t = torch.fmod(t - self.t0, self.period)
+        ts = state_dict["timestamp"]
+        if self.ts0[0] < 0:
+            self.ts0 = ts
+        t = timestamp_diff(ts, self.ts0)
+        # print(ts, self.ts0)
+        # print(t)
 
         # Get joint state
         q_current = state_dict["joint_pos"]
@@ -69,15 +72,16 @@ class NNPeriodicPositionController(toco.PolicyModule):
         super().__init__()
         self.net = net
         self.period = period
-        self.t0 = torch.tensor(-1.0)
+        self.ts0 = -torch.ones(2, dtype=torch.int32)
+
         self.feedback = toco.modules.JointSpacePD(Kp, Kd)
 
     def forward(self, state_dict: Dict[str, torch.Tensor]):
         # Acquire timestamp
-        t = state_dict["timestamp"]
-        if self.t0 < 0:
-            self.t0 = t
-        t = torch.fmod(t - self.t0, self.period)
+        ts = state_dict["timestamp"]
+        if self.ts0[0] < 0:
+            self.ts0 = ts
+        t = torch.fmod(timestamp_diff(ts, self.ts0), self.period)
 
         # Get joint state
         q_current = state_dict["joint_pos"]
@@ -108,8 +112,11 @@ class CircleTask:
 
     @staticmethod
     def process_log(log):
-        timestamp_ls = [timestamp2float(e.timestamp) for e in log]
-        inputs = [torch.Tensor([t]) for t in timestamp_ls]
+        timestamp_ls = [
+            torch.Tensor([e.timestamp.seconds, e.timestamp.nanos]) for e in log
+        ]
+        t0 = timestamp_ls[0]
+        inputs = [timestamp_diff(t, t0).unsqueeze(0) for t in timestamp_ls]
         outputs = [torch.Tensor(e.joint_positions) for e in log]
 
         return inputs, outputs
