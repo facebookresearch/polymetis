@@ -6,7 +6,7 @@ import torch
 import torchcontrol as toco
 
 PI = 3.1415926
-RADIUS = 0.15
+RADIUS = 0.1
 PERIOD = 4
 
 
@@ -24,6 +24,7 @@ class CircleDemoController(toco.PolicyModule):
     def __init__(self, joint_positions, Kp, Kd, robot_model, period):
         super().__init__()
         self.robot_model = robot_model
+        self.q_initial = joint_positions
 
         self.omega = 2 * PI / PERIOD
         self.radius = RADIUS
@@ -46,6 +47,7 @@ class CircleDemoController(toco.PolicyModule):
 
         # Compute next joint pos
         J = self.robot_model.compute_jacobian(q_current)
+        Jinv = torch.pinverse(J)
         x_current, _ = self.robot_model.forward_kinematics(q_current)
 
         theta = self.omega * t
@@ -53,7 +55,10 @@ class CircleDemoController(toco.PolicyModule):
         x_desired[0] = x_desired[0] + self.radius * (torch.cos(theta) - 1)
         x_desired[1] = x_desired[1] + self.radius * torch.sin(theta)
 
-        q_desired = q_current + torch.pinverse(J)[:, 0:3] @ (x_desired - x_current)
+        q_desired = q_current + Jinv[:, 0:3] @ (x_desired - x_current)
+
+        # Null space correction
+        q_desired = q_desired + (torch.eye(7) - Jinv @ J) @ (self.q_initial - q_desired)
 
         # Feedback control
         torque_out = self.feedback(
