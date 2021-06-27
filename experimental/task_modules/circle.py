@@ -16,13 +16,13 @@ def timestamp2float(timestamp):
 class CircleDemoController(toco.PolicyModule):
     twopi: int
 
-    def __init__(self, joint_positions, Kq, Kqd, robot_model, period):
+    def __init__(self, joint_positions, Kp, Kd, robot_model, period):
         super().__init__()
         self.robot_model = robot_model
         self.period = period
 
         self.omega = 2 * PI / self.period
-        self.feedback = toco.modules.JointSpacePD(kq, kqd)
+        self.feedback = toco.modules.JointSpacePD(Kp, Kd)
 
         # Get initial pose
         self.x0 = self.robot_model.forward_kinematics(joint_positions)
@@ -58,12 +58,12 @@ class CircleDemoController(toco.PolicyModule):
 
 
 class NNPeriodicPositionController(toco.PolicyModule):
-    def __init__(self, net, Kq, Kqd, period):
+    def __init__(self, net, Kp, Kd, period):
         super().__init__()
         self.net = net
         self.period = period
         self.t0 = -1
-        self.feedback = toco.modules.JointSpacePD(kq, kqd)
+        self.feedback = toco.modules.JointSpacePD(Kp, Kd)
 
     def forward(self, state_dict: Dict[str, torch.Tensor]):
         # Acquire timestamp
