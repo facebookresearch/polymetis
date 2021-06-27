@@ -85,7 +85,7 @@ class NNPeriodicPositionController(toco.PolicyModule):
         return {"torque_desired": torque_out}
 
 
-class PdTask:
+class CircleTask:
     @staticmethod
     def get_demonstration_policy(robot):
         joint_pos_current = robot.get_joint_angles()
