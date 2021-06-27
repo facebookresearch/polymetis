@@ -1,5 +1,6 @@
 from typing import Dict
 
+import google
 import torch
 
 import torchcontrol as toco
@@ -9,12 +10,14 @@ RADIUS = 0.15
 PERIOD = 4
 
 
-def timestamp2float(timestamp):
+def timestamp2float(timestamp: google.protobuf.timestamp_pb2.Timestamp):
     return timestamp.seconds + 1e-9 * timestamp.nanos
 
 
 class CircleDemoController(toco.PolicyModule):
-    twopi: int
+    omega: float
+    period: float
+    radius: float
 
     def __init__(self, joint_positions, Kp, Kd, robot_model, period):
         super().__init__()
@@ -22,17 +25,19 @@ class CircleDemoController(toco.PolicyModule):
         self.period = period
 
         self.omega = 2 * PI / self.period
+        self.radius = RADIUS
         self.feedback = toco.modules.JointSpacePD(Kp, Kd)
 
-        # Get initial pose
-        self.x0 = self.robot_model.forward_kinematics(joint_positions)
+        # Initialize
+        self.x0, _ = self.robot_model.forward_kinematics(joint_positions)
+        self.t0 = torch.tensor(-1.0)
 
     def forward(self, state_dict: Dict[str, torch.Tensor]):
         # Acquire timestamp
-        t = timestamp2float(state_dict["timestamp"])
+        t = state_dict["timestamp"]
         if self.t0 < 0:
             self.t0 = t
-        t = (t - self.t0) % self.period
+        t = torch.fmod(t - self.t0, self.period)
 
         # Get joint state
         q_current = state_dict["joint_pos"]
@@ -40,12 +45,12 @@ class CircleDemoController(toco.PolicyModule):
 
         # Compute next joint pos
         J = self.robot_model.compute_jacobian(q_current)
-        x_current = self.robot_model.forward_kinematics(q_current)
+        x_current, _ = self.robot_model.forward_kinematics(q_current)
 
         theta = self.omega * t
-        x_desired = self.x0.copy()
-        x_desired[0] = x_desired[0] + RADIUS * (torch.cos(theta) - 1)
-        x_desired[1] = x_desired[1] + RADIUS * torch.sin(theta)
+        x_desired = self.x0.clone()
+        x_desired[0] = x_desired[0] + self.radius * (torch.cos(theta) - 1)
+        x_desired[1] = x_desired[1] + self.radius * torch.sin(theta)
 
         q_desired = q_current + torch.pinverse(J)[:, 0:3] @ (x_desired - x_current)
 
@@ -58,26 +63,28 @@ class CircleDemoController(toco.PolicyModule):
 
 
 class NNPeriodicPositionController(toco.PolicyModule):
+    period: float
+
     def __init__(self, net, Kp, Kd, period):
         super().__init__()
         self.net = net
         self.period = period
-        self.t0 = -1
+        self.t0 = torch.tensor(-1.0)
         self.feedback = toco.modules.JointSpacePD(Kp, Kd)
 
     def forward(self, state_dict: Dict[str, torch.Tensor]):
         # Acquire timestamp
-        t = timestamp2float(state_dict["timestamp"])
+        t = state_dict["timestamp"]
         if self.t0 < 0:
             self.t0 = t
-        t = (t - self.t0) % self.period
+        t = torch.fmod(t - self.t0, self.period)
 
         # Get joint state
         q_current = state_dict["joint_pos"]
         qd_current = state_dict["joint_vel"]
 
         # Feedback control
-        q_desired = self.net(torch.Tensor([t]))
+        q_desired = self.net(t.unsqueeze(0))
         torque_out = self.feedback(
             q_current, qd_current, q_desired, torch.zeros_like(qd_current)
         )
