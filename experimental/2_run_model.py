@@ -1,5 +1,4 @@
 import os
-from typing import Dict
 import time
 
 import torch
@@ -11,22 +10,12 @@ import torchcontrol as toco
 from models.mlp import MlpTrainer
 
 
-class NNController(toco.PolicyModule):
-    def __init__(self, net):
-        super().__init__()
-        self.net = net
-
-    def forward(self, state_dict: Dict[str, torch.Tensor]):
-        joint_pos = state_dict["joint_pos"]
-        joint_vel = state_dict["joint_vel"]
-
-        state = torch.cat([joint_pos, joint_vel])
-
-        return {"torque_desired": self.net(state)}
-
-
 @hydra.main(config_path="conf/experiment.yml")
 def main(cfg):
+    # Initialize
+    robot = RobotInterface(ip_address="localhost")
+    task_module = hydra.utils.instantiate(cfg.task.module)
+
     # Load model & create controller
     print("Loading model...")
     assert (
@@ -40,15 +29,12 @@ def main(cfg):
     print(f"Model loaded from {model_path}")
 
     net = mlp.get_model()
-    nn_policy = NNController(net)
-
-    # Initialize robot
-    robot = RobotInterface(ip_address="localhost")
+    nn_policy = task_module.get_controller(robot, net)
 
     # Move robot to desired pos
-    print("Moving robot to desired position...")
-    robot.set_ee_pose(
-        position=torch.Tensor(cfg.task.desired_pos), orientation=None, time_to_go=3.0
+    print("Moving robot to initial position...")
+    robot.set_joint_positions(
+        desired_positions=torch.Tensor(cfg.task.joint_pos_init), time_to_go=3.0
     )
 
     # Execute model

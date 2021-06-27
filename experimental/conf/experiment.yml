@@ -1,9 +1,7 @@
-task:
-  n_dofs: 7
-  desired_pos: [0.5238, -0.0939,  0.4285]
+task: ???
 
 data:
-  collection_time: 60
+  collection_time: 5
   filename: "data.pt"
 
 model:
