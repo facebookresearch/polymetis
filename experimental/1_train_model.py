@@ -6,7 +6,7 @@ import hydra
 from models.mlp import MlpTrainer
 
 
-@hydra.main(config_path="conf/experiment.yml")
+@hydra.main(config_path="conf", config_name="experiment.yml")
 def main(cfg):
     # Load data
     assert (

@@ -10,7 +10,7 @@ import torchcontrol as toco
 from models.mlp import MlpTrainer
 
 
-@hydra.main(config_path="conf/experiment.yml")
+@hydra.main(config_path="conf", config_name="experiment.yml")
 def main(cfg):
     # Initialize
     robot = RobotInterface(ip_address="localhost")
@@ -41,7 +41,7 @@ def main(cfg):
     print("Executing NN policy...")
     robot.send_torch_policy(nn_policy, blocking=False)
     try:
-        time.sleep(20)
+        time.sleep(cfg.task.policy_execution_time)
     except KeyboardInterrupt:
         print("Interrupted by user.")
     log = robot.terminate_current_policy()

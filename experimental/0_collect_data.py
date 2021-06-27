@@ -9,7 +9,7 @@ from polymetis import RobotInterface
 import torchcontrol as toco
 
 
-@hydra.main(config_path="conf/experiment.yml")
+@hydra.main(config_path="conf", config_name="experiment.yml")
 def main(cfg):
     # Initialize
     robot = RobotInterface(ip_address="localhost")
@@ -26,7 +26,7 @@ def main(cfg):
     demo_policy = task_module.get_demonstration_policy(robot)
     robot.send_torch_policy(demo_policy, blocking=False)
     try:
-        time.sleep(cfg.data.collection_time)
+        time.sleep(cfg.task.data_collection_time)
     except KeyboardInterrupt:
         print("Interrupted by user.")
     log = robot.terminate_current_policy()
