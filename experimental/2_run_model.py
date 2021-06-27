@@ -31,7 +31,7 @@ def main(cfg):
     net = mlp.get_model()
     nn_policy = task_module.get_controller(robot, net)
 
-    # Move robot to desired pos
+    # Move robot to initial pos
     print("Moving robot to initial position...")
     robot.set_joint_positions(
         desired_positions=torch.Tensor(cfg.task.joint_pos_init), time_to_go=3.0

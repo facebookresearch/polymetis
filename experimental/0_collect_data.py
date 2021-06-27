@@ -21,7 +21,7 @@ def main(cfg):
         desired_positions=torch.Tensor(cfg.task.joint_pos_init), time_to_go=3.0
     )
 
-    # Execute Cartesian PD
+    # Execute demo policy
     print("Executing demonstration policy...")
     demo_policy = task_module.get_demonstration_policy(robot)
     robot.send_torch_policy(demo_policy, blocking=False)
