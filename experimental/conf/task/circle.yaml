@@ -1,7 +1,7 @@
 task:
   data_collection_time: 60
   policy_execution_time: 20
-  joint_pos_init: [-0.13935425877571106, -0.020481698215007782, -0.05201413854956627, -2.0691256523132324, 0.05058913677930832, 2.0028650760650635, -0.9167874455451965]
+  joint_pos_init: [0.0098,  0.3146,  0.0178, -1.9033, -0.0331,  2.2675, -0.5955]
   module: 
     _target_: task_modules.circle.CircleTask
 
