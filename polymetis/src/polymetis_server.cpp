@@ -77,7 +77,7 @@ Status PolymetisControllerServerImpl::InitRobotClient(
   num_dofs_ = robot_client_metadata->dof();
 
   // Create initial state dictionary
-  timestamp_ = torch::zeros(2);
+  timestamp_ = torch::zeros(2).to(torch::kInt32);
   joint_pos_ = torch::zeros(num_dofs_);
   joint_vel_ = torch::zeros(num_dofs_);
 
