@@ -37,10 +37,8 @@ class CircleDemoController(toco.PolicyModule):
         # Acquire timestamp
         ts = state_dict["timestamp"]
         if self.ts0[0] < 0:
-            self.ts0 = ts
+            self.ts0 = ts.clone()
         t = timestamp_diff(ts, self.ts0)
-        # print(ts, self.ts0)
-        # print(t)
 
         # Get joint state
         q_current = state_dict["joint_pos"]
