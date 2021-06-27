@@ -1,7 +1,6 @@
 task: ???
 
 data:
-  collection_time: 5
   filename: "data.pt"
 
 data_dir: ""

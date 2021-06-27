@@ -1,4 +1,6 @@
 task:
+  data_collection_time: 12
+  policy_exeution_time: 20
   joint_pos_init: [-0.13935425877571106, -0.020481698215007782, -0.05201413854956627, -2.0691256523132324, 0.05058913677930832, 2.0028650760650635, -0.9167874455451965]
   module: 
     _target_: task_modules.pd.PdTask

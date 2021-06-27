@@ -5,7 +5,7 @@ import torch
 import torchcontrol as toco
 
 
-class NNController(toco.PolicyModule):
+class NNTorqueController(toco.PolicyModule):
     def __init__(self, net):
         super().__init__()
         self.net = net
@@ -47,4 +47,4 @@ class PdTask:
 
     @staticmethod
     def get_controller(robot, net):
-        return NNController(net)
+        return NNTorqueController(net)
