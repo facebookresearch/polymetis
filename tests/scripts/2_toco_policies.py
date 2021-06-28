@@ -46,8 +46,8 @@ if __name__ == "__main__":
     print("=== torchcontrol.policies.CartesianImpedanceControl ===")
     policy = toco.policies.CartesianImpedanceControl(
         joint_pos_current=joint_pos_current,
-        Kp=torch.zeros(num_dofs),
-        Kd=torch.zeros(num_dofs),
+        Kp=torch.zeros(6, 6),
+        Kd=torch.zeros(6, 6),
         robot_model=robot_model,
     )
     run_unending_policy(robot, policy, time_to_go)
