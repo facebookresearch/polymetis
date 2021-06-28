@@ -1,5 +1,5 @@
 task:
-  data_collection_time: 60
+  data_collection_time: 8
   policy_execution_time: 20
   joint_pos_init: [0.0098,  0.3146,  0.0178, -1.9033, -0.0331,  2.2675, -0.5955]
   module: 

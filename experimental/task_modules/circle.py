@@ -16,6 +16,10 @@ def timestamp_diff(ts1, ts2):
     )
 
 
+def get_ts_feature(ts, ts0, period: float):
+    return torch.fmod(timestamp_diff(ts, ts0), period).unsqueeze(0)
+
+
 class CircleDemoController(toco.PolicyModule):
     omega: float
     period: float
@@ -84,14 +88,14 @@ class NNPeriodicPositionController(toco.PolicyModule):
         ts = state_dict["timestamp"]
         if self.ts0[0] < 0:
             self.ts0 = ts.clone()
-        t = torch.fmod(timestamp_diff(ts, self.ts0), self.period)
+        t_in = get_ts_feature(ts, self.ts0, self.period)
 
         # Get joint state
         q_current = state_dict["joint_pos"]
         qd_current = state_dict["joint_vel"]
 
         # Feedback control
-        q_desired = self.net(t.unsqueeze(0))
+        q_desired = self.net(t_in)
         torque_out = self.feedback(
             q_current, qd_current, q_desired, torch.zeros_like(qd_current)
         )
@@ -118,8 +122,8 @@ class CircleTask:
         timestamp_ls = [
             torch.Tensor([e.timestamp.seconds, e.timestamp.nanos]) for e in log
         ]
-        t0 = timestamp_ls[0]
-        inputs = [timestamp_diff(t, t0).unsqueeze(0) for t in timestamp_ls]
+        ts0 = timestamp_ls[0]
+        inputs = [get_ts_feature(ts, ts0, PERIOD) for ts in timestamp_ls]
         outputs = [torch.Tensor(e.joint_positions) for e in log]
 
         return inputs, outputs
