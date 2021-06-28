@@ -55,7 +55,7 @@ class CircleDemoController(toco.PolicyModule):
         x_desired[0] = x_desired[0] + self.radius * (torch.cos(theta) - 1)
         x_desired[1] = x_desired[1] + self.radius * torch.sin(theta)
 
-        q_desired = q_current + Jinv[:, 0:3] @ (x_desired - x_current)
+        q_desired = q_current + torch.pinverse(J[0:3, :]) @ (x_desired - x_current)
 
         # Null space correction
         q_desired = q_desired + (torch.eye(7) - Jinv @ J) @ (self.q_initial - q_desired)
@@ -83,7 +83,7 @@ class NNPeriodicPositionController(toco.PolicyModule):
         # Acquire timestamp
         ts = state_dict["timestamp"]
         if self.ts0[0] < 0:
-            self.ts0 = ts
+            self.ts0 = ts.clone()
         t = torch.fmod(timestamp_diff(ts, self.ts0), self.period)
 
         # Get joint state
