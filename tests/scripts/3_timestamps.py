@@ -10,24 +10,42 @@ import torch
 from polymetis import RobotInterface
 import torchcontrol as toco
 
+WARMUP_STEPS = 5
+TOTAL_STEPS = 30
+
 
 class TimestampCheckController(toco.PolicyModule):
-    def __init__(self, hz):
+    i: int
+    warmup_steps: int
+    total_steps: int
+
+    def __init__(self, hz, warmup_steps, total_steps):
         super().__init__()
 
         self.dt = torch.tensor(1.0 / hz)
-        self.ts_prev = -torch.ones(2).to(torch.int32)
+        self.warmup_steps = warmup_steps
+        self.total_steps = total_steps
+
+        self.i = 0
+        self.ts_prev = torch.zeros(2).to(torch.int32)
 
     def forward(self, state_dict: Dict[str, torch.Tensor]):
         ts = state_dict["timestamp"]
 
-        if self.ts_prev[0] > 0:
+        # Check timestamp
+        if self.i > self.warmup_steps:
             t_diff = (ts[0] - self.ts_prev[0]).to(torch.float32) + 1e-9 * (
                 ts[1] - self.ts_prev[1]
             ).to(torch.float32)
-            assert torch.allclose(t_diff, self.dt)
+            assert torch.allclose(t_diff, self.dt, atol=1e-3)  # millisecond accuracy
 
-        self.ts_prev = ts
+        # Update
+        self.i += 1
+        self.ts_prev = ts.clone()
+
+        # Termination
+        if self.i > self.total_steps:
+            self.set_terminated()
 
         return {"torque_desired": torch.zeros(7)}
 
@@ -39,7 +57,7 @@ if __name__ == "__main__":
     )
 
     # Run policy
-    policy = TimestampCheckController(robot.metadata.hz)
-    robot.send_torch_policy(policy, blocking=False)
-    time.sleep(10 / robot.metadata.hz)
-    robot.terminate_current_policy()
+    policy = TimestampCheckController(
+        hz=robot.metadata.hz, warmup_steps=WARMUP_STEPS, total_steps=TOTAL_STEPS
+    )
+    robot.send_torch_policy(policy)
