@@ -77,13 +77,13 @@ Status PolymetisControllerServerImpl::InitRobotClient(
   num_dofs_ = robot_client_metadata->dof();
 
   // Create initial state dictionary
-  timestamp_ = torch::tensor(0.0);
-  joint_pos_ = torch::zeros(num_dofs_);
-  joint_vel_ = torch::zeros(num_dofs_);
+  rs_timestamp_ = torch::tensor(0.0);
+  rs_joint_positions_ = torch::zeros(num_dofs_);
+  rs_joint_velocities_ = torch::zeros(num_dofs_);
 
-  state_dict_.insert("timestamp", timestamp_);
-  state_dict_.insert("joint_positions", joint_pos_);
-  state_dict_.insert("joint_velocities", joint_vel_);
+  state_dict_.insert("timestamp", rs_timestamp_);
+  state_dict_.insert("joint_positions", rs_joint_positions_);
+  state_dict_.insert("joint_velocities", rs_joint_velocities_);
 
   // Load default controller bytes into model buffer
   controller_model_buffer_.clear();
@@ -149,12 +149,13 @@ PolymetisControllerServerImpl::ControlUpdate(ServerContext *context,
   }
 
   // Parse robot state
-  auto timestamp_msg = robot_state->timestamp();
-  auto a = timestamp_.data_ptr<float>();
-  *a = float(timestamp_msg.seconds()) + float(timestamp_msg.nanos()) * 1e-9;
+  auto rs_timestamp_msg = robot_state->timestamp();
+  auto a = rs_timestamp_.data_ptr<float>();
+  *a = float(rs_timestamp_msg.seconds()) +
+       float(rs_timestamp_msg.nanos()) * 1e-9;
   for (int i = 0; i < num_dofs_; i++) {
-    joint_pos_[i] = robot_state->joint_positions(i);
-    joint_vel_[i] = robot_state->joint_velocities(i);
+    rs_joint_positions_[i] = robot_state->joint_positions(i);
+    rs_joint_velocities_[i] = robot_state->joint_velocities(i);
   }
 
   // Select controller
