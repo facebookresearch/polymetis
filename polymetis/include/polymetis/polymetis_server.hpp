@@ -175,6 +175,8 @@ private:
   torch::Tensor rs_timestamp_;
   torch::Tensor rs_joint_positions_;
   torch::Tensor rs_joint_velocities_;
+  torch::Tensor rs_motor_torques_measured_;
+  torch::Tensor rs_motor_torques_external_;
 
   c10::Dict<std::string, torch::Tensor> state_dict_;
 
