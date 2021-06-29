@@ -82,8 +82,8 @@ Status PolymetisControllerServerImpl::InitRobotClient(
   joint_vel_ = torch::zeros(num_dofs_);
 
   state_dict_.insert("timestamp", timestamp_);
-  state_dict_.insert("joint_pos", joint_pos_);
-  state_dict_.insert("joint_vel", joint_vel_);
+  state_dict_.insert("joint_positions", joint_pos_);
+  state_dict_.insert("joint_velocities", joint_vel_);
 
   // Load default controller bytes into model buffer
   controller_model_buffer_.clear();
@@ -171,7 +171,7 @@ PolymetisControllerServerImpl::ControlUpdate(ServerContext *context,
       controller->forward(input_).toGenericDict();
   custom_controller_context_.controller_mtx.unlock();
 
-  torch::jit::IValue key = torch::jit::IValue("torque_desired");
+  torch::jit::IValue key = torch::jit::IValue("joint_torques");
   torch::Tensor desired_torque = controller_state_dict.at(key).toTensor();
 
   for (int i = 0; i < num_dofs_; i++) {
