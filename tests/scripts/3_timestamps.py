@@ -34,7 +34,7 @@ class TimestampCheckController(toco.PolicyModule):
 
         # Check timestamp
         if self.i > self.warmup_steps:
-            t_diff = toco.utils.timstamp_diff(ts, self.ts_prev)
+            t_diff = toco.utils.timestamp_diff_seconds(ts, self.ts_prev)
             assert torch.allclose(t_diff, self.dt, atol=1e-3)  # millisecond accuracy
 
         # Update
